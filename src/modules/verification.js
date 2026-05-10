@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  MessageFlags,
 } from 'discord.js';
 import { baseEmbed } from '../utils/embed.js';
 import { ids } from '../utils/ids.js';
@@ -68,7 +69,7 @@ export const verificationModule = {
     const config = getConfig(ctx);
     if (!await requireStaff(interaction, ctx.config)) return;
     if (!config.enabled) {
-      await interaction.reply({ content: 'Verification is disabled.', ephemeral: true });
+      await interaction.reply({ content: 'Verification is disabled.', flags: MessageFlags.Ephemeral });
       return;
     }
 
@@ -76,12 +77,12 @@ export const verificationModule = {
       await interaction.guild.channels.fetch(config.verificationChannelId).catch(() => null);
 
     if (!channel?.isTextBased()) {
-      await interaction.reply({ content: 'Verification channel is not configured or cannot be found.', ephemeral: true });
+      await interaction.reply({ content: 'Verification channel is not configured or cannot be found.', flags: MessageFlags.Ephemeral });
       return;
     }
 
     await channel.send(buildPanel(ctx));
-    await interaction.reply({ content: `Verification panel posted in ${channel}.`, ephemeral: true });
+    await interaction.reply({ content: `Verification panel posted in ${channel}.`, flags: MessageFlags.Ephemeral });
   },
 
   async handleButton(interaction, ctx) {
@@ -90,7 +91,7 @@ export const verificationModule = {
 
     const member = interaction.member;
     if (config.verifiedRoleId && member.roles.cache.has(config.verifiedRoleId)) {
-      await interaction.reply({ content: config.messages?.alreadyVerified ?? 'You are already verified.', ephemeral: true });
+      await interaction.reply({ content: config.messages?.alreadyVerified ?? 'You are already verified.', flags: MessageFlags.Ephemeral });
       return true;
     }
 
@@ -99,9 +100,9 @@ export const verificationModule = {
       if (config.joinRoleId && config.joinRoleId !== interaction.guild.roles.everyone.id) {
         await member.roles.remove(config.joinRoleId).catch(() => null);
       }
-      await interaction.reply({ content: config.messages?.success ?? 'You are now verified.', ephemeral: true });
+      await interaction.reply({ content: config.messages?.success ?? 'You are now verified.', flags: MessageFlags.Ephemeral });
     } catch {
-      await interaction.reply({ content: config.messages?.failed ?? 'I could not verify you. Please contact staff.', ephemeral: true });
+      await interaction.reply({ content: config.messages?.failed ?? 'I could not verify you. Please contact staff.', flags: MessageFlags.Ephemeral });
     }
 
     return true;

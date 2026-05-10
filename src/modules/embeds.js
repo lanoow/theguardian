@@ -1,4 +1,4 @@
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, MessageFlags } from 'discord.js';
 import { runTextWizard } from '../services/wizard.js';
 import { requireStaff } from '../utils/permissions.js';
 
@@ -64,7 +64,7 @@ export const embedsModule = {
   async handleCommand(interaction, ctx) {
     const config = getConfig(ctx);
     if (!config.enabled) {
-      await interaction.reply({ content: 'Embed tools are disabled.', ephemeral: true });
+      await interaction.reply({ content: 'Embed tools are disabled.', flags: MessageFlags.Ephemeral });
       return true;
     }
     if (!await requireStaff(interaction, ctx.config, config.staffRoles ?? [])) return true;
@@ -76,21 +76,21 @@ export const embedsModule = {
       const messageId = interaction.options.getString('message_id', true);
       const message = await channel.messages.fetch(messageId).catch(() => null);
       if (!message) {
-        await interaction.reply({ content: 'Message not found.', ephemeral: true });
+        await interaction.reply({ content: 'Message not found.', flags: MessageFlags.Ephemeral });
         return true;
       }
       if (message.author.id !== interaction.client.user.id) {
-        await interaction.reply({ content: 'I can only delete embed messages that were sent by this bot.', ephemeral: true });
+        await interaction.reply({ content: 'I can only delete embed messages that were sent by this bot.', flags: MessageFlags.Ephemeral });
         return true;
       }
       await message.delete();
-      await interaction.reply({ content: 'Embed deleted.', ephemeral: true });
+      await interaction.reply({ content: 'Embed deleted.', flags: MessageFlags.Ephemeral });
       return true;
     }
 
     await interaction.reply({
       content: 'Answer the embed setup questions in this channel. Reply `skip` for optional fields.',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const channel = await targetChannel(interaction);
@@ -99,7 +99,7 @@ export const embedsModule = {
       const answers = await collectEmbed(interaction);
       const embed = buildEmbedFromAnswers(answers);
       await channel.send({ embeds: [embed] });
-      await interaction.followUp({ content: `Embed posted in ${channel}.`, ephemeral: true });
+      await interaction.followUp({ content: `Embed posted in ${channel}.`, flags: MessageFlags.Ephemeral });
       return true;
     }
 
@@ -107,11 +107,11 @@ export const embedsModule = {
       const messageId = interaction.options.getString('message_id', true);
       const message = await channel.messages.fetch(messageId).catch(() => null);
       if (!message) {
-        await interaction.followUp({ content: 'Message not found.', ephemeral: true });
+        await interaction.followUp({ content: 'Message not found.', flags: MessageFlags.Ephemeral });
         return true;
       }
       if (message.author.id !== interaction.client.user.id) {
-        await interaction.followUp({ content: 'I can only edit embed messages that were sent by this bot.', ephemeral: true });
+        await interaction.followUp({ content: 'I can only edit embed messages that were sent by this bot.', flags: MessageFlags.Ephemeral });
         return true;
       }
 
@@ -119,7 +119,7 @@ export const embedsModule = {
       const answers = await collectEmbed(interaction, current);
       const embed = buildEmbedFromAnswers(answers, current);
       await message.edit({ embeds: [embed] });
-      await interaction.followUp({ content: 'Embed updated.', ephemeral: true });
+      await interaction.followUp({ content: 'Embed updated.', flags: MessageFlags.Ephemeral });
       return true;
     }
 

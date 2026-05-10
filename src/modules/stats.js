@@ -1,4 +1,4 @@
-import { ChannelType, PermissionFlagsBits } from 'discord.js';
+import { ChannelType, MessageFlags, PermissionFlagsBits } from 'discord.js';
 import { requireStaff } from '../utils/permissions.js';
 
 const refreshTimers = new Map();
@@ -8,13 +8,12 @@ function getConfig(ctx) {
   return ctx.config.modules.stats ?? {};
 }
 
-async function countStat(guild, stat) {
+function countStat(guild, stat) {
   if (stat.type === 'members') return guild.memberCount;
 
-  const members = await guild.members.fetch();
-  if (stat.type === 'bots') return members.filter((member) => member.user.bot).size;
+  if (stat.type === 'bots') return guild.members.cache.filter((member) => member.user.bot).size;
   if (stat.type === 'role') {
-    return members.filter((member) => member.roles.cache.has(stat.roleId)).size;
+    return guild.roles.cache.get(stat.roleId)?.members.size ?? 0;
   }
 
   return 0;
@@ -28,7 +27,7 @@ async function refreshGuildStats(guild, ctx) {
   const channels = store.channels[guild.id] ?? {};
 
   for (const stat of config.channels ?? []) {
-    const count = await countStat(guild, stat);
+    const count = countStat(guild, stat);
     const name = stat.name.replaceAll('{count}', String(count));
     let channel = channels[stat.key] ? await guild.channels.fetch(channels[stat.key]).catch(() => null) : null;
 
@@ -69,7 +68,7 @@ async function refreshGuildStatsOnce(guild, ctx) {
 export const statsModule = {
   async handleCommand(interaction, ctx) {
     if (!await requireStaff(interaction, ctx.config)) return true;
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     await refreshGuildStatsOnce(interaction.guild, ctx);
     await interaction.editReply('Stats refreshed.');
     return true;

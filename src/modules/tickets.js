@@ -5,6 +5,7 @@ import {
   ButtonStyle,
   ChannelType,
   EmbedBuilder,
+  MessageFlags,
   PermissionFlagsBits,
 } from 'discord.js';
 import { createTranscript } from '../services/transcript.js';
@@ -106,7 +107,7 @@ export const ticketsModule = {
     const config = kindConfig(ctx, kind);
 
     if (!root.enabled || !config) {
-      await interaction.reply({ content: 'This ticket panel is disabled or not configured.', ephemeral: true });
+      await interaction.reply({ content: 'This ticket panel is disabled or not configured.', flags: MessageFlags.Ephemeral });
       return;
     }
 
@@ -114,12 +115,12 @@ export const ticketsModule = {
       await interaction.guild.channels.fetch(config.panelChannelId).catch(() => null);
 
     if (!channel?.isTextBased()) {
-      await interaction.reply({ content: 'Panel channel is not configured or cannot be found.', ephemeral: true });
+      await interaction.reply({ content: 'Panel channel is not configured or cannot be found.', flags: MessageFlags.Ephemeral });
       return;
     }
 
     await channel.send(buildPanel(ctx, kind));
-    await interaction.reply({ content: `${kind === 'bugs' ? 'Bug' : 'Support'} panel posted in ${channel}.`, ephemeral: true });
+    await interaction.reply({ content: `${kind === 'bugs' ? 'Bug' : 'Support'} panel posted in ${channel}.`, flags: MessageFlags.Ephemeral });
   },
 
   async handleButton(interaction, ctx) {
@@ -129,7 +130,7 @@ export const ticketsModule = {
     const root = moduleConfig(ctx);
     const config = kindConfig(ctx, kind);
     if (!root.enabled || !config) {
-      await interaction.reply({ content: 'Tickets are currently disabled.', ephemeral: true });
+      await interaction.reply({ content: 'Tickets are currently disabled.', flags: MessageFlags.Ephemeral });
       return true;
     }
 
@@ -139,11 +140,11 @@ export const ticketsModule = {
       ticket.status !== 'closed'
     );
     if (existing) {
-      await interaction.reply({ content: `You already have an open ${kind === 'bugs' ? 'bug report' : 'ticket'}: <#${existing.channelId}>`, ephemeral: true });
+      await interaction.reply({ content: `You already have an open ${kind === 'bugs' ? 'bug report' : 'ticket'}: <#${existing.channelId}>`, flags: MessageFlags.Ephemeral });
       return true;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const permissionOverwrites = [
       {
@@ -242,12 +243,12 @@ export const ticketsModule = {
 
     const ticket = getOpenTicketByChannel(ctx, interaction.channelId);
     if (!ticket) {
-      await interaction.reply({ content: 'This command must be run inside an open ticket channel.', ephemeral: true });
+      await interaction.reply({ content: 'This command must be run inside an open ticket channel.', flags: MessageFlags.Ephemeral });
       return true;
     }
 
     if (!isStaff(interaction.member, ctx.config, staffRoleIds(ctx, ticket.kind))) {
-      await interaction.reply({ content: 'Only staff can close tickets.', ephemeral: true });
+      await interaction.reply({ content: 'Only staff can close tickets.', flags: MessageFlags.Ephemeral });
       return true;
     }
 
@@ -255,7 +256,7 @@ export const ticketsModule = {
     const reason = interaction.options.getString('reason', true);
     const other = interaction.options.getString('other_result');
     if (result === 'other' && !other) {
-      await interaction.reply({ content: '`other_result` is required when result is Other.', ephemeral: true });
+      await interaction.reply({ content: '`other_result` is required when result is Other.', flags: MessageFlags.Ephemeral });
       return true;
     }
 

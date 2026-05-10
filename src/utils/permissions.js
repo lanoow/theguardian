@@ -1,3 +1,5 @@
+import { MessageFlags } from 'discord.js';
+
 export function hasAnyRole(member, roleIds = []) {
   if (!member || !Array.isArray(roleIds) || roleIds.length === 0) return false;
   return roleIds.some((roleId) => member.roles.cache.has(roleId));
@@ -17,7 +19,7 @@ export async function requireStaff(interaction, config, extraRoles = []) {
 
   await interaction.reply({
     content: 'You do not have permission to use this.',
-    ephemeral: true,
+    flags: MessageFlags.Ephemeral,
   });
   return false;
 }

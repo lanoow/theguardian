@@ -3,6 +3,7 @@ import {
   ActivityType,
   Client,
   GatewayIntentBits,
+  MessageFlags,
   Partials,
 } from 'discord.js';
 import { buildHelpEmbed } from './commands/help.js';
@@ -121,7 +122,7 @@ client.on('interactionCreate', async (interaction) => {
     }
   } catch (error) {
     logger.error('Interaction failed:', error);
-    const payload = { content: 'Something went wrong while running that command.', ephemeral: true };
+    const payload = { content: 'Something went wrong while running that command.', flags: MessageFlags.Ephemeral };
     if (interaction.deferred || interaction.replied) {
       await interaction.followUp(payload).catch(() => null);
     } else {

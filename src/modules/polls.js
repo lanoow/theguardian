@@ -1,4 +1,4 @@
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, MessageFlags } from 'discord.js';
 import { runTextWizard } from '../services/wizard.js';
 import { parseDuration } from '../utils/duration.js';
 import { requireStaff } from '../utils/permissions.js';
@@ -90,14 +90,14 @@ export const pollsModule = {
   async handleCommand(interaction, ctx) {
     const config = getConfig(ctx);
     if (!config.enabled) {
-      await interaction.reply({ content: 'Polls are disabled.', ephemeral: true });
+      await interaction.reply({ content: 'Polls are disabled.', flags: MessageFlags.Ephemeral });
       return true;
     }
     if (!await requireStaff(interaction, ctx.config, config.staffRoles ?? [])) return true;
 
     await interaction.reply({
       content: 'Answer the poll setup questions in this channel. Use `skip` for the image.',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
 
     const answers = await runTextWizard(interaction.channel, interaction.user, [
@@ -121,7 +121,7 @@ export const pollsModule = {
     if (!target?.isTextBased() || !duration || options.length < 2) {
       await interaction.followUp({
         content: 'Poll creation failed. Check the target channel, duration, and provide at least two options.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return true;
     }
@@ -146,7 +146,7 @@ export const pollsModule = {
     }
 
     savePoll(ctx, poll);
-    await interaction.followUp({ content: `Poll posted in ${target}.`, ephemeral: true });
+    await interaction.followUp({ content: `Poll posted in ${target}.`, flags: MessageFlags.Ephemeral });
     return true;
   },
 
