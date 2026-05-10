@@ -50,6 +50,8 @@ You can also post panels manually:
 /setup ticket-panel
 ```
 
+Mention the bot in any channel it can read to receive a help embed listing all available slash commands.
+
 ## Slash Command Troubleshooting
 
 If `/setup` or the other slash commands do not appear in Discord:

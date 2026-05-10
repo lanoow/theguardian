@@ -5,6 +5,7 @@ import {
   GatewayIntentBits,
   Partials,
 } from 'discord.js';
+import { buildHelpEmbed } from './commands/help.js';
 import { createContext } from './core/context.js';
 import { logger } from './core/logger.js';
 import { embedsModule } from './modules/embeds.js';
@@ -55,6 +56,18 @@ client.once('ready', async () => {
 client.on('guildMemberAdd', async (member) => {
   await verificationModule.onGuildMemberAdd(member, ctx).catch((error) => {
     logger.warn('Failed to process guildMemberAdd:', error);
+  });
+});
+
+client.on('messageCreate', async (message) => {
+  if (message.author.bot || !client.user) return;
+  if (!message.mentions.users.has(client.user.id)) return;
+
+  await message.reply({
+    embeds: [buildHelpEmbed(ctx.config)],
+    allowedMentions: { repliedUser: false },
+  }).catch((error) => {
+    logger.warn('Failed to send mention help:', error);
   });
 });
 
