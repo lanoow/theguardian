@@ -9,7 +9,7 @@ A modular Discord.js support-server bot configured with YAML files.
 - Discord-like HTML transcripts
 - Staff embed creation, editing, and deletion
 - Timed polls with reaction results
-- Voice-channel statistics
+- Event-driven voice-channel statistics
 
 ## Setup
 
@@ -51,6 +51,8 @@ You can also post panels manually:
 ```
 
 Mention the bot in any channel it can read to receive a help embed listing all available slash commands.
+
+Stats channels refresh when the bot starts, when members join or leave, when member roles change, and after verification button clicks. A periodic fallback is only used if `fallbackIntervalMinutes` is set above `0` in `config/modules/stats.yml`.
 
 ## Slash Command Troubleshooting
 

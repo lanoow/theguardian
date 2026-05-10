@@ -1,6 +1,9 @@
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
 import { requireStaff } from '../utils/permissions.js';
 
+const refreshTimers = new Map();
+const refreshPromises = new Map();
+
 function getConfig(ctx) {
   return ctx.config.modules.stats ?? {};
 }
@@ -51,13 +54,44 @@ async function refreshGuildStats(guild, ctx) {
   ctx.stores.stats.write(store);
 }
 
+async function refreshGuildStatsOnce(guild, ctx) {
+  const existing = refreshPromises.get(guild.id);
+  if (existing) return existing;
+
+  const promise = refreshGuildStats(guild, ctx)
+    .finally(() => {
+      refreshPromises.delete(guild.id);
+    });
+  refreshPromises.set(guild.id, promise);
+  return promise;
+}
+
 export const statsModule = {
   async handleCommand(interaction, ctx) {
     if (!await requireStaff(interaction, ctx.config)) return true;
     await interaction.deferReply({ ephemeral: true });
-    await refreshGuildStats(interaction.guild, ctx);
+    await refreshGuildStatsOnce(interaction.guild, ctx);
     await interaction.editReply('Stats refreshed.');
     return true;
+  },
+
+  scheduleRefresh(guild, ctx, delayMs = 2_000) {
+    const config = getConfig(ctx);
+    if (!config.enabled || !guild) return;
+
+    const existingTimer = refreshTimers.get(guild.id);
+    if (existingTimer) clearTimeout(existingTimer);
+
+    const timer = setTimeout(() => {
+      refreshTimers.delete(guild.id);
+      refreshGuildStatsOnce(guild, ctx).catch(() => null);
+    }, delayMs);
+
+    refreshTimers.set(guild.id, timer);
+  },
+
+  async refreshNow(guild, ctx) {
+    await refreshGuildStatsOnce(guild, ctx);
   },
 
   async ready(client, ctx) {
@@ -71,6 +105,9 @@ export const statsModule = {
     };
 
     await refreshAll();
-    setInterval(refreshAll, (config.updateIntervalMinutes ?? 10) * 60_000);
+
+    if (config.fallbackIntervalMinutes > 0) {
+      setInterval(refreshAll, config.fallbackIntervalMinutes * 60_000);
+    }
   },
 };
