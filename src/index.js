@@ -39,7 +39,7 @@ const client = new Client({
   partials: [Partials.Channel, Partials.Message, Partials.Reaction, Partials.User],
 });
 
-client.once('ready', async () => {
+client.once('clientReady', async () => {
   logger.info(`Logged in as ${client.user.tag}`);
   const activity = ctx.config.bot?.activity;
   if (activity) {
