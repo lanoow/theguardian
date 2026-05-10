@@ -50,6 +50,22 @@ You can also post panels manually:
 /setup ticket-panel
 ```
 
+## Slash Command Troubleshooting
+
+If `/setup` or the other slash commands do not appear in Discord:
+
+- Run `npm run deploy` after filling in `.env`.
+- Confirm `DISCORD_GUILD_ID` is the server ID where you are testing.
+- Confirm `DISCORD_CLIENT_ID` belongs to the same application as `DISCORD_TOKEN`.
+- Re-invite the bot with both scopes: `bot` and `applications.commands`.
+- Restart or reload Discord after deploying commands.
+
+The deploy script should print the registered command names:
+
+```bash
+Deployed 5 guild slash commands to YOUR_GUILD_ID: /setup, /ticket, /embed, /poll, /stats
+```
+
 ## Required Discord Intents
 
 Enable these in the Discord developer portal before running the bot:

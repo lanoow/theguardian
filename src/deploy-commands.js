@@ -11,8 +11,10 @@ if (!token || !clientId || !guildId) {
 }
 
 const rest = new REST({ version: '10' }).setToken(token);
-await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-  body: buildCommandData(),
+const commands = buildCommandData();
+const deployedCommands = await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+  body: commands,
 });
 
-console.log('Slash commands deployed.');
+const commandNames = deployedCommands.map((command) => `/${command.name}`).join(', ');
+console.log(`Deployed ${deployedCommands.length} guild slash commands to ${guildId}: ${commandNames}`);
