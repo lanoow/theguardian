@@ -73,6 +73,38 @@ function getOpenTicketByChannel(ctx, channelId) {
   return ctx.stores.tickets.read().tickets.find((ticket) => ticket.channelId === channelId && ticket.status !== 'closed');
 }
 
+function ticketPermissionOverwrites(guild, userId, staffRoles) {
+  return [
+    {
+      id: guild.roles.everyone.id,
+      deny: [PermissionFlagsBits.ViewChannel],
+    },
+    {
+      id: userId,
+      allow: [
+        PermissionFlagsBits.ViewChannel,
+        PermissionFlagsBits.SendMessages,
+        PermissionFlagsBits.ReadMessageHistory,
+        PermissionFlagsBits.AttachFiles,
+      ],
+    },
+    ...staffRoles.map((roleId) => ({
+      id: roleId,
+      allow: [
+        PermissionFlagsBits.ViewChannel,
+        PermissionFlagsBits.SendMessages,
+        PermissionFlagsBits.ReadMessageHistory,
+        PermissionFlagsBits.AttachFiles,
+        PermissionFlagsBits.ManageMessages,
+      ],
+    })),
+  ];
+}
+
+async function ensureTicketChannelPermissions(channel, guild, userId, staffRoles) {
+  await channel.permissionOverwrites.set(ticketPermissionOverwrites(guild, userId, staffRoles));
+}
+
 async function lockTicketChannel(channel, ticket) {
   await channel.permissionOverwrites.edit(ticket.openerId, {
     SendMessages: false,
@@ -146,39 +178,16 @@ export const ticketsModule = {
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    const permissionOverwrites = [
-      {
-        id: interaction.guild.roles.everyone.id,
-        deny: [PermissionFlagsBits.ViewChannel],
-      },
-      {
-        id: interaction.user.id,
-        allow: [
-          PermissionFlagsBits.ViewChannel,
-          PermissionFlagsBits.SendMessages,
-          PermissionFlagsBits.ReadMessageHistory,
-          PermissionFlagsBits.AttachFiles,
-        ],
-      },
-      ...staffRoleIds(ctx, kind).map((roleId) => ({
-        id: roleId,
-        allow: [
-          PermissionFlagsBits.ViewChannel,
-          PermissionFlagsBits.SendMessages,
-          PermissionFlagsBits.ReadMessageHistory,
-          PermissionFlagsBits.AttachFiles,
-          PermissionFlagsBits.ManageMessages,
-        ],
-      })),
-    ];
+    const ticketStaffRoles = staffRoleIds(ctx, kind);
 
     const channel = await interaction.guild.channels.create({
       name: makeChannelName(config.channelName, interaction.user),
       type: ChannelType.GuildText,
       parent: config.categoryId,
       topic: `${kind} ticket opened by ${interaction.user.tag} (${interaction.user.id})`,
-      permissionOverwrites,
+      permissionOverwrites: ticketPermissionOverwrites(interaction.guild, interaction.user.id, ticketStaffRoles),
     });
+    await ensureTicketChannelPermissions(channel, interaction.guild, interaction.user.id, ticketStaffRoles);
 
     const ticket = {
       id: `${kind}-${channel.id}`,
