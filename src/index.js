@@ -46,6 +46,7 @@ client.once('ready', async () => {
   }
 
   await Promise.allSettled([
+    verificationModule.ready(client, ctx),
     pollsModule.ready(client, ctx),
     statsModule.ready(client, ctx),
   ]);

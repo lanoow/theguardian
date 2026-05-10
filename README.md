@@ -41,6 +41,15 @@ A modular Discord.js support-server bot configured with YAML files.
    npm start
    ```
 
+The verification panel is posted automatically on startup when `verificationChannelId` is configured and no recent verification panel from the bot exists in that channel. To disable automatic posting, set `panel.autoPost: false` in `config/modules/verification.yml`.
+
+You can also post panels manually:
+
+```bash
+/setup verification-panel
+/setup ticket-panel
+```
+
 ## Required Discord Intents
 
 Enable these in the Discord developer portal before running the bot:

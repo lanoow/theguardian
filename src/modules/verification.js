@@ -33,7 +33,30 @@ function buildPanel(ctx) {
   };
 }
 
+function messageHasVerificationButton(message) {
+  return message.components.some((row) =>
+    row.components.some((component) => component.customId === ids.verificationButton)
+  );
+}
+
 export const verificationModule = {
+  async ready(client, ctx) {
+    const config = getConfig(ctx);
+    if (!config.enabled || config.panel?.autoPost === false || !config.verificationChannelId) return;
+
+    const channel = await client.channels.fetch(config.verificationChannelId).catch(() => null);
+    if (!channel?.isTextBased()) return;
+
+    const recentMessages = await channel.messages.fetch({ limit: 50 }).catch(() => null);
+    const existingPanel = recentMessages?.some((message) =>
+      message.author.id === client.user.id && messageHasVerificationButton(message)
+    );
+
+    if (!existingPanel) {
+      await channel.send(buildPanel(ctx));
+    }
+  },
+
   async onGuildMemberAdd(member, ctx) {
     const config = getConfig(ctx);
     if (!config.enabled || !config.joinRoleId) return;
