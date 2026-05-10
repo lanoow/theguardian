@@ -1,0 +1,17 @@
+enabled: true
+
+joinRoleId: "UNVERIFIED_ROLE_ID"
+verifiedRoleId: "VERIFIED_ROLE_ID"
+verificationChannelId: "VERIFICATION_CHANNEL_ID"
+
+panel:
+  title: "Verify your account"
+  description: "Click the button below to gain access to the server."
+  color: "#57F287"
+  buttonLabel: "Verify"
+  buttonEmoji: "✅"
+
+messages:
+  success: "You are now verified."
+  alreadyVerified: "You are already verified."
+  failed: "I could not verify you. Please contact staff."

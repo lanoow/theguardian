@@ -1,0 +1,42 @@
+enabled: true
+
+support:
+  panelChannelId: "SUPPORT_PANEL_CHANNEL_ID"
+  categoryId: "SUPPORT_CATEGORY_ID"
+  transcriptChannelId: "SUPPORT_TRANSCRIPTS_CHANNEL_ID"
+  staffRoles:
+    - "STAFF_ROLE_ID"
+  panel:
+    title: "Need help?"
+    description: "Open a support ticket and our staff will help you."
+    buttonLabel: "Open Ticket"
+    buttonEmoji: "🎫"
+    color: "#5865F2"
+  channelName: "ticket-{username}"
+  questions:
+    - "What do you need help with?"
+    - "What have you already tried?"
+    - "Can you share any screenshots, logs, or IDs?"
+
+bugs:
+  panelChannelId: "BUG_PANEL_CHANNEL_ID"
+  categoryId: "BUG_CATEGORY_ID"
+  transcriptChannelId: "BUG_TRANSCRIPTS_CHANNEL_ID"
+  staffRoles:
+    - "STAFF_ROLE_ID"
+  panel:
+    title: "Report a bug"
+    description: "Open a bug report and include reproduction details."
+    buttonLabel: "Report Bug"
+    buttonEmoji: "🐛"
+    color: "#ED4245"
+  channelName: "bug-{username}"
+  questions:
+    - "What happened?"
+    - "What did you expect to happen?"
+    - "How can we reproduce it?"
+    - "What platform/version are you using?"
+
+settings:
+  questionTimeoutMinutes: 20
+  transcriptFetchLimit: 1000

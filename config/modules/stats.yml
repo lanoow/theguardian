@@ -1,0 +1,16 @@
+enabled: true
+updateIntervalMinutes: 10
+
+categoryId: "STATS_CATEGORY_ID"
+
+channels:
+  - key: "members"
+    type: "members"
+    name: "Members: {count}"
+  - key: "bots"
+    type: "bots"
+    name: "Bots: {count}"
+  - key: "verified"
+    type: "role"
+    roleId: "VERIFIED_ROLE_ID"
+    name: "Verified: {count}"

@@ -1,0 +1,5 @@
+enabled: true
+staffRoles:
+  - "STAFF_ROLE_ID"
+maxOptions: 10
+defaultColor: "#FEE75C"

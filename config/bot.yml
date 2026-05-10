@@ -1,0 +1,14 @@
+bot:
+  activity: "Managing support"
+  defaultColor: "#5865F2"
+  timezone: "Europe/Sofia"
+
+permissions:
+  staffRoles:
+    - "STAFF_ROLE_ID"
+  adminRoles:
+    - "ADMIN_ROLE_ID"
+
+storage:
+  dataDir: "data"
+  transcriptDir: "transcripts"
