@@ -16,6 +16,15 @@ import { verificationModule } from './modules/verification.js';
 const token = process.env.DISCORD_TOKEN;
 if (!token) throw new Error('DISCORD_TOKEN is required.');
 
+function explainStartupError(error) {
+  if (error?.message !== 'Used disallowed intents') return false;
+
+  logger.error('Discord rejected one or more privileged gateway intents.');
+  logger.error('Enable Server Members Intent and Message Content Intent in the Discord Developer Portal under Bot > Privileged Gateway Intents.');
+  logger.error('Server Members Intent is required for verification and role statistics. Message Content Intent is required for setup wizards and ticket questions.');
+  return true;
+}
+
 const ctx = createContext();
 const client = new Client({
   intents: [
@@ -95,4 +104,21 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
-client.login(token);
+client.on('shardError', (error) => {
+  if (!explainStartupError(error)) {
+    logger.error('Discord shard error:', error);
+  }
+});
+
+process.on('unhandledRejection', (error) => {
+  if (!explainStartupError(error)) {
+    logger.error('Unhandled rejection:', error);
+  }
+});
+
+client.login(token).catch((error) => {
+  if (!explainStartupError(error)) {
+    logger.error('Failed to log in:', error);
+  }
+  process.exitCode = 1;
+});
