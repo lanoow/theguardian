@@ -52,7 +52,7 @@ You can also post panels manually:
 
 Mention the bot in any channel it can read to receive a help embed listing all available slash commands.
 
-Stats channels refresh when the bot starts, when members join or leave, when member roles change, and after verification button clicks. A periodic fallback is only used if `fallbackIntervalMinutes` is set above `0` in `config/modules/stats.yml`.
+Stats channels build an accurate role/bot snapshot when the bot starts, then refresh when members join or leave, when member roles change, and after verification button clicks. Run `/stats refresh` after changing a stat role ID or after assigning roles while the bot was offline. A periodic fallback is only used if `fallbackIntervalMinutes` is set above `0` in `config/modules/stats.yml`.
 
 ## Slash Command Troubleshooting
 

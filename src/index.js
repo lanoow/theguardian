@@ -58,15 +58,15 @@ client.on('guildMemberAdd', async (member) => {
   await verificationModule.onGuildMemberAdd(member, ctx).catch((error) => {
     logger.warn('Failed to process guildMemberAdd:', error);
   });
-  statsModule.scheduleRefresh(member.guild, ctx);
+  statsModule.recordMemberAdd(member, ctx);
 });
 
 client.on('guildMemberRemove', async (member) => {
-  statsModule.scheduleRefresh(member.guild, ctx);
+  statsModule.recordMemberRemove(member, ctx);
 });
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
-  statsModule.scheduleRefresh(newMember.guild, ctx);
+  statsModule.recordMemberUpdate(oldMember, newMember, ctx);
 });
 
 client.on('messageCreate', async (message) => {

@@ -13,7 +13,7 @@ export function createContext() {
     stores: {
       tickets: new JsonStore(dataDir, 'tickets.json', { tickets: [] }),
       polls: new JsonStore(dataDir, 'polls.json', { polls: [] }),
-      stats: new JsonStore(dataDir, 'stats.json', { channels: {} }),
+      stats: new JsonStore(dataDir, 'stats.json', { channels: {}, snapshots: {} }),
     },
   };
 }
