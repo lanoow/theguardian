@@ -105,12 +105,11 @@ async function ensureTicketChannelPermissions(channel, guild, userId, staffRoles
   await channel.permissionOverwrites.set(ticketPermissionOverwrites(guild, userId, staffRoles));
 }
 
-async function lockTicketChannel(channel, ticket) {
-  await channel.permissionOverwrites.edit(ticket.openerId, {
-    SendMessages: false,
-    AttachFiles: false,
-  }).catch(() => null);
-  await channel.setName(`closed-${channel.name}`.slice(0, 90)).catch(() => null);
+async function deleteTicketChannel(channel) {
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2_000);
+  });
+  await channel.delete('Ticket closed and transcript delivered.').catch(() => null);
 }
 
 function closeEmbed(ctx, ticket, closeInfo, transcriptUrl) {
@@ -319,7 +318,7 @@ export const ticketsModule = {
     addOrUpdateTicket(ctx, ticket);
 
     await interaction.editReply({ embeds: [closeEmbed(ctx, ticket, closeInfo, transcriptUrl)] });
-    await lockTicketChannel(interaction.channel, ticket);
+    await deleteTicketChannel(interaction.channel);
     return true;
   },
 };

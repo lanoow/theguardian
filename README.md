@@ -54,7 +54,7 @@ Mention the bot in any channel it can read to receive a help embed listing all a
 
 Stats channels build an accurate role/bot snapshot when the bot starts, then refresh when members join or leave, when member roles change, and after verification button clicks. Run `/stats refresh` after changing a stat role ID or after assigning roles while the bot was offline. A periodic fallback is only used if `fallbackIntervalMinutes` is set above `0` in `config/modules/stats.yml`.
 
-Ticket channels are created under the configured category with explicit channel-level overwrites: `@everyone` cannot view the channel, the opener can view/send/read/upload, and configured staff roles can view/respond/manage messages.
+Ticket channels are created under the configured category with explicit channel-level overwrites: `@everyone` cannot view the channel, the opener can view/send/read/upload, and configured staff roles can view/respond/manage messages. Closed ticket channels are deleted after transcripts are sent to the opener and transcript log channel.
 
 ## Slash Command Troubleshooting
 
