@@ -57,6 +57,7 @@ Mention the bot in any channel it can read to receive a help embed listing all a
 If `/setup` or the other slash commands do not appear in Discord:
 
 - Run `npm run deploy` after filling in `.env`.
+- Run `npm run commands:list` to confirm Discord has commands registered for that guild.
 - Confirm `DISCORD_GUILD_ID` is the server ID where you are testing.
 - Confirm `DISCORD_CLIENT_ID` belongs to the same application as `DISCORD_TOKEN`.
 - Re-invite the bot with both scopes: `bot` and `applications.commands`.

@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { REST, Routes } from 'discord.js';
+import { PermissionsBitField, REST, Routes } from 'discord.js';
 import { buildCommandData } from './commands/definitions.js';
 
 const token = process.env.DISCORD_TOKEN;
@@ -16,5 +16,21 @@ const deployedCommands = await rest.put(Routes.applicationGuildCommands(clientId
   body: commands,
 });
 
+const permissions = new PermissionsBitField([
+  'ViewChannel',
+  'SendMessages',
+  'ReadMessageHistory',
+  'ManageChannels',
+  'ManageRoles',
+  'ManageMessages',
+  'AttachFiles',
+  'AddReactions',
+]).bitfield.toString();
+const inviteParams = new URLSearchParams({
+  client_id: clientId,
+  permissions,
+  scope: 'bot applications.commands',
+});
 const commandNames = deployedCommands.map((command) => `/${command.name}`).join(', ');
 console.log(`Deployed ${deployedCommands.length} guild slash commands to ${guildId}: ${commandNames}`);
+console.log(`If commands are not visible, re-invite the bot with this URL: https://discord.com/oauth2/authorize?${inviteParams.toString()}`);
