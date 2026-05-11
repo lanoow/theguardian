@@ -1,5 +1,11 @@
-import { EmbedBuilder, MessageFlags } from 'discord.js';
-import { runTextWizard } from '../services/wizard.js';
+import {
+  ActionRowBuilder,
+  EmbedBuilder,
+  MessageFlags,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+} from 'discord.js';
 import { parseDuration } from '../utils/duration.js';
 import { requireStaff } from '../utils/permissions.js';
 import { truncate } from '../utils/text.js';
@@ -29,6 +35,10 @@ function parseOptions(value, maxOptions) {
     .filter((option) => option.emoji && option.label);
 }
 
+function isSkip(value) {
+  return ['skip', 'none', 'no', '-'].includes(String(value ?? '').trim().toLowerCase());
+}
+
 function pollEmbed(ctx, poll, status = 'open') {
   const embed = new EmbedBuilder()
     .setTitle(status === 'open' ? poll.question : `${poll.question} (ended)`)
@@ -56,6 +66,56 @@ function savePoll(ctx, poll) {
     if (index === -1) data.polls.push(poll);
     else data.polls[index] = poll;
   });
+}
+
+async function createPollFromData(interaction, ctx, data) {
+  const config = getConfig(ctx);
+  const target = data.channel.toLowerCase() === 'here'
+    ? interaction.channel
+    : parseChannel(interaction.guild, data.channel, interaction.channel);
+  const duration = parseDuration(data.duration);
+  const options = parseOptions(data.options, config.maxOptions ?? 10);
+
+  if (!target?.isTextBased() || !duration || options.length < 2) {
+    await interaction.reply({
+      content: 'Poll creation failed. Check the target channel, duration, and provide at least two options.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const poll = {
+    guildId: interaction.guildId,
+    channelId: target.id,
+    createdById: interaction.user.id,
+    question: truncate(data.question, 256),
+    content: isSkip(data.content) ? '' : truncate(data.content, 4096),
+    image: isSkip(data.image) ? null : data.image,
+    options,
+    endsAt: new Date(Date.now() + duration).toISOString(),
+    status: 'open',
+  };
+
+  const message = await target.send({ embeds: [pollEmbed(ctx, poll)] });
+  poll.messageId = message.id;
+
+  for (const option of options) {
+    await message.react(option.emoji).catch(() => null);
+  }
+
+  savePoll(ctx, poll);
+  await interaction.reply({ content: `Poll posted in ${target}.`, flags: MessageFlags.Ephemeral });
+}
+
+function modalInput(id, label, style, required = true, placeholder = '') {
+  const input = new TextInputBuilder()
+    .setCustomId(id)
+    .setLabel(label)
+    .setStyle(style)
+    .setRequired(required);
+
+  if (placeholder) input.setPlaceholder(placeholder);
+  return new ActionRowBuilder().addComponents(input);
 }
 
 async function endPoll(client, ctx, poll) {
@@ -95,58 +155,31 @@ export const pollsModule = {
     }
     if (!await requireStaff(interaction, ctx.config, config.staffRoles ?? [])) return true;
 
-    await interaction.reply({
-      content: 'Answer the poll setup questions in this channel. Use `skip` for the image.',
-      flags: MessageFlags.Ephemeral,
+    const modal = new ModalBuilder()
+      .setCustomId('poll:create')
+      .setTitle('Create poll')
+      .addComponents(
+        modalInput('channel', 'Channel ID/mention or here', TextInputStyle.Short, true, 'here'),
+        modalInput('question', 'Poll question', TextInputStyle.Short),
+        modalInput('content', 'Poll content or skip', TextInputStyle.Paragraph, false, 'skip'),
+        modalInput('options', 'Options: emoji = meaning, one per line', TextInputStyle.Paragraph),
+        modalInput('duration', 'Duration: 30m, 2h, 1d', TextInputStyle.Short)
+      );
+
+    await interaction.showModal(modal);
+    return true;
+  },
+
+  async handleModal(interaction, ctx) {
+    if (interaction.customId !== 'poll:create') return false;
+    await createPollFromData(interaction, ctx, {
+      channel: interaction.fields.getTextInputValue('channel'),
+      question: interaction.fields.getTextInputValue('question'),
+      content: interaction.fields.getTextInputValue('content'),
+      image: '',
+      options: interaction.fields.getTextInputValue('options'),
+      duration: interaction.fields.getTextInputValue('duration'),
     });
-
-    const answers = await runTextWizard(interaction.channel, interaction.user, [
-      'Which channel should receive the poll? Mention it, paste the ID, or reply `here`.',
-      'What is the poll question?',
-      'Poll content/body text.',
-      'Image URL, or `skip`.',
-      'Poll options, one per line as `emoji = meaning`.',
-      'When should the poll end? Use examples like `30m`, `2h`, or `1d`.',
-    ], {
-      timeoutMs: 240_000,
-      deleteMessages: false,
-    });
-
-    const target = answers[0].answer.toLowerCase() === 'here'
-      ? interaction.channel
-      : parseChannel(interaction.guild, answers[0].answer, interaction.channel);
-    const duration = parseDuration(answers[5].answer);
-    const options = parseOptions(answers[4].answer, config.maxOptions ?? 10);
-
-    if (!target?.isTextBased() || !duration || options.length < 2) {
-      await interaction.followUp({
-        content: 'Poll creation failed. Check the target channel, duration, and provide at least two options.',
-        flags: MessageFlags.Ephemeral,
-      });
-      return true;
-    }
-
-    const poll = {
-      guildId: interaction.guildId,
-      channelId: target.id,
-      createdById: interaction.user.id,
-      question: truncate(answers[1].answer, 256),
-      content: answers[2].answer.toLowerCase() === 'skip' ? '' : truncate(answers[2].answer, 4096),
-      image: answers[3].answer.toLowerCase() === 'skip' ? null : answers[3].answer,
-      options,
-      endsAt: new Date(Date.now() + duration).toISOString(),
-      status: 'open',
-    };
-
-    const message = await target.send({ embeds: [pollEmbed(ctx, poll)] });
-    poll.messageId = message.id;
-
-    for (const option of options) {
-      await message.react(option.emoji).catch(() => null);
-    }
-
-    savePoll(ctx, poll);
-    await interaction.followUp({ content: `Poll posted in ${target}.`, flags: MessageFlags.Ephemeral });
     return true;
   },
 

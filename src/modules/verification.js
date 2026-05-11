@@ -36,6 +36,12 @@ function buildPanel(ctx) {
   };
 }
 
+async function savePanelMessage(ctx, key, message) {
+  ctx.stores.panels.update((data) => {
+    data.panels[key] = { channelId: message.channelId, messageId: message.id };
+  });
+}
+
 function messageHasVerificationButton(message) {
   return message.components.some((row) =>
     row.components.some((component) => component.customId === ids.verificationButton)
@@ -56,7 +62,8 @@ export const verificationModule = {
     );
 
     if (!existingPanel) {
-      await channel.send(buildPanel(ctx));
+      const message = await channel.send(buildPanel(ctx));
+      await savePanelMessage(ctx, 'verification', message);
     }
   },
 
@@ -83,8 +90,28 @@ export const verificationModule = {
       return;
     }
 
-    await channel.send(buildPanel(ctx));
+    const message = await channel.send(buildPanel(ctx));
+    await savePanelMessage(ctx, 'verification', message);
     await interaction.reply({ content: `Verification panel posted in ${channel}.`, flags: MessageFlags.Ephemeral });
+  },
+
+  async refreshPanel(interaction, ctx) {
+    if (!await requireStaff(interaction, ctx.config)) return;
+    const panel = ctx.stores.panels.read().panels.verification;
+    if (!panel) {
+      await interaction.reply({ content: 'No stored verification panel found. Use `/setup verification-panel` first.', flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    const channel = await interaction.guild.channels.fetch(panel.channelId).catch(() => null);
+    const message = channel?.isTextBased() ? await channel.messages.fetch(panel.messageId).catch(() => null) : null;
+    if (!message) {
+      await interaction.reply({ content: 'Stored verification panel message no longer exists. Use `/setup verification-panel` first.', flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    await message.edit(buildPanel(ctx));
+    await interaction.reply({ content: 'Verification panel refreshed.', flags: MessageFlags.Ephemeral });
   },
 
   async handleButton(interaction, ctx) {

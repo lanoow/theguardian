@@ -19,6 +19,7 @@ support:
     - "What do you need help with?"
     - "What have you already tried?"
     - "Can you share any screenshots, logs, or IDs?"
+  categories: []
 
 bugs:
   panelChannelId: "BUG_PANEL_CHANNEL_ID"
@@ -40,7 +41,27 @@ bugs:
     - "What did you expect to happen?"
     - "How can we reproduce it?"
     - "What platform/version are you using?"
+  categories: []
 
 settings:
   questionTimeoutMinutes: 20
   transcriptFetchLimit: 1000
+  cooldownMinutes: 5
+  blacklistUserIds: []
+  inactivity:
+    warningMinutes: 1440
+    autoCloseMinutes: 2880
+
+priorities:
+  low:
+    label: "Low"
+    color: "#57F287"
+  normal:
+    label: "Normal"
+    color: "#5865F2"
+  high:
+    label: "High"
+    color: "#FEE75C"
+  urgent:
+    label: "Urgent"
+    color: "#ED4245"

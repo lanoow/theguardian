@@ -80,6 +80,35 @@ Stats channels build an accurate role/bot snapshot when the bot starts, then ref
 
 Ticket channels are created under the configured category with explicit channel-level overwrites: `@everyone` cannot view the channel, the opener can view/send/read/upload, and configured staff roles can view/respond/manage messages. Closed ticket channels are deleted after transcripts are sent to the opener and transcript log channel.
 
+Ticket upgrades included:
+
+- `/ticket claim` assigns the ticket to a staff member.
+- `/ticket priority` changes ticket priority.
+- `/ticket reopen` recreates a closed ticket channel from a ticket ID.
+- `/ticket blacklist add/remove` blocks or unblocks ticket creation for a user.
+- Configurable cooldowns prevent repeated ticket spam.
+- Configurable inactivity warnings and auto-close run from `config/modules/tickets.yml`.
+- Closed-ticket DMs include a 1-5 rating row.
+- Transcripts include ticket metadata, message IDs, author IDs, edited timestamps, reactions, embeds, and attachments.
+
+Ticket categories can be configured per support type. If categories are present, users choose a category before choosing priority:
+
+```yaml
+support:
+  categories:
+    - key: "billing"
+      label: "Billing"
+      description: "Payments, invoices, and purchases"
+      categoryId: "OPTIONAL_CATEGORY_ID"
+      staffRoles:
+        - "OPTIONAL_STAFF_ROLE_ID"
+      questions:
+        - "What billing issue are you having?"
+        - "What is your order or invoice ID?"
+```
+
+Audit logging is optional. Set `bot.auditLogChannelId` globally, or `auditLogChannelId` under a specific support/bug config.
+
 ## Slash Command Troubleshooting
 
 If `/setup` or the other slash commands do not appear in Discord:

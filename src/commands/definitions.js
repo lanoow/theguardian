@@ -39,6 +39,22 @@ export function buildCommandData() {
               .setDescription('Where to post the panel.')
               .addChannelTypes(ChannelType.GuildText)
           )
+      )
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName('refresh-panel')
+          .setDescription('Refresh a stored bot panel if it exists.')
+          .addStringOption((option) =>
+            option
+              .setName('panel')
+              .setDescription('Panel to refresh.')
+              .setRequired(true)
+              .addChoices(
+                { name: 'Verification', value: 'verification' },
+                { name: 'Support tickets', value: 'support' },
+                { name: 'Bug reports', value: 'bugs' }
+              )
+          )
       ),
 
     new SlashCommandBuilder()
@@ -71,6 +87,60 @@ export function buildCommandData() {
               .setName('other_result')
               .setDescription('Required when result is Other.')
               .setMaxLength(200)
+          )
+      )
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName('claim')
+          .setDescription('Claim the current ticket.')
+      )
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName('priority')
+          .setDescription('Change the current ticket priority.')
+          .addStringOption((option) =>
+            option
+              .setName('level')
+              .setDescription('Priority level.')
+              .setRequired(true)
+              .addChoices(
+                { name: 'Low', value: 'low' },
+                { name: 'Normal', value: 'normal' },
+                { name: 'High', value: 'high' },
+                { name: 'Urgent', value: 'urgent' }
+              )
+          )
+      )
+      .addSubcommand((subcommand) =>
+        subcommand
+          .setName('reopen')
+          .setDescription('Reopen a closed ticket into a new channel.')
+          .addStringOption((option) =>
+            option
+              .setName('ticket_id')
+              .setDescription('Ticket ID from the transcript/close embed.')
+              .setRequired(true)
+          )
+      )
+      .addSubcommandGroup((group) =>
+        group
+          .setName('blacklist')
+          .setDescription('Manage ticket blacklist.')
+          .addSubcommand((subcommand) =>
+            subcommand
+              .setName('add')
+              .setDescription('Block a user from opening tickets.')
+              .addUserOption((option) =>
+                option.setName('user').setDescription('User to block.').setRequired(true)
+              )
+          )
+          .addSubcommand((subcommand) =>
+            subcommand
+              .setName('remove')
+              .setDescription('Allow a user to open tickets again.')
+              .addUserOption((option) =>
+                option.setName('user').setDescription('User to unblock.').setRequired(true)
+              )
           )
       ),
 

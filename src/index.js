@@ -14,6 +14,7 @@ import { pollsModule } from './modules/polls.js';
 import { statsModule } from './modules/stats.js';
 import { ticketsModule } from './modules/tickets.js';
 import { verificationModule } from './modules/verification.js';
+import { validateConfig } from './services/config-validator.js';
 
 const token = process.env.DISCORD_TOKEN;
 if (!token) throw new Error('DISCORD_TOKEN is required.');
@@ -48,9 +49,11 @@ client.once('clientReady', async () => {
   }
 
   await Promise.allSettled([
+    validateConfig(client, ctx),
     verificationModule.ready(client, ctx),
     pollsModule.ready(client, ctx),
     statsModule.ready(client, ctx),
+    ticketsModule.ready(client, ctx),
   ]);
 });
 
@@ -71,6 +74,10 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot || !client.user) return;
+  await ticketsModule.handleMessage(message, ctx).catch((error) => {
+    logger.warn('Failed to process ticket message activity:', error);
+  });
+
   if (!message.mentions.users.has(client.user.id)) return;
 
   await message.reply({
@@ -89,6 +96,16 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
       if (await ticketsModule.handleButton(interaction, ctx)) return;
+      if (await ticketsModule.handleRatingButton(interaction, ctx)) return;
+    }
+
+    if (interaction.isStringSelectMenu()) {
+      if (await ticketsModule.handleSelect(interaction, ctx)) return;
+    }
+
+    if (interaction.isModalSubmit()) {
+      if (await embedsModule.handleModal(interaction, ctx)) return;
+      if (await pollsModule.handleModal(interaction, ctx)) return;
     }
 
     if (!interaction.isChatInputCommand()) return;
@@ -102,6 +119,14 @@ client.on('interactionCreate', async (interaction) => {
       if (subcommand === 'ticket-panel') {
         await ticketsModule.postPanel(interaction, ctx);
         return;
+      }
+      if (subcommand === 'refresh-panel') {
+        const panel = interaction.options.getString('panel', true);
+        if (panel === 'verification') {
+          await verificationModule.refreshPanel(interaction, ctx);
+          return;
+        }
+        if (await ticketsModule.refreshPanel(interaction, ctx)) return;
       }
     }
 

@@ -2,6 +2,7 @@ bot:
   activity: "Managing support"
   defaultColor: "#5865F2"
   timezone: "Europe/Sofia"
+  auditLogChannelId: ""
 
 permissions:
   staffRoles:

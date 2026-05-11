@@ -31,7 +31,11 @@ function renderMessage(message) {
   const author = message.author;
   const avatar = author.displayAvatarURL({ extension: 'png', size: 64 });
   const timestamp = new Date(message.createdTimestamp).toLocaleString();
+  const edited = message.editedTimestamp ? ` edited ${new Date(message.editedTimestamp).toLocaleString()}` : '';
   const content = message.content ? escapeHtml(message.content).replaceAll('\n', '<br>') : '';
+  const reactions = message.reactions.cache.size
+    ? `<div class="reactions">${message.reactions.cache.map((reaction) => `<span>${escapeHtml(reaction.emoji.toString())} ${reaction.count}</span>`).join('')}</div>`
+    : '';
   const embeds = message.embeds
     .map((embed) => {
       const title = embed.title ? `<div class="embed-title">${escapeHtml(embed.title)}</div>` : '';
@@ -47,11 +51,13 @@ function renderMessage(message) {
       <div class="body">
         <div class="meta">
           <span class="name">${escapeHtml(author.tag)}</span>
-          <span class="time">${escapeHtml(timestamp)}</span>
+          <span class="time">${escapeHtml(timestamp)}${escapeHtml(edited)}</span>
         </div>
         <div class="content">${content || '<span class="muted">(no text)</span>'}</div>
+        <div class="message-id">Message ID: ${escapeHtml(message.id)} | Author ID: ${escapeHtml(author.id)}</div>
         ${embeds}
         ${attachments ? `<div class="attachments">${attachments}</div>` : ''}
+        ${reactions}
       </div>
     </article>
   `;
@@ -67,6 +73,14 @@ export async function createTranscript(channel, ticket, closeInfo, options) {
   const qa = (ticket.answers ?? [])
     .map((item) => `<dt>${escapeHtml(item.question)}</dt><dd>${escapeHtml(item.answer).replaceAll('\n', '<br>')}</dd>`)
     .join('');
+  const metadata = [
+    ['Ticket ID', ticket.id],
+    ['Kind', ticket.kind],
+    ['Category', ticket.categoryKey ?? 'general'],
+    ['Priority', ticket.priority ?? 'normal'],
+    ['Claimed by', ticket.claimedByTag ?? ticket.claimedById ?? 'Unclaimed'],
+    ['Previous ticket', ticket.previousTicketId ?? 'None'],
+  ].map(([key, value]) => `<span>${escapeHtml(key)}: ${escapeHtml(value)}</span>`).join('');
 
   const html = `<!doctype html>
 <html lang="en">
@@ -91,6 +105,7 @@ export async function createTranscript(channel, ticket, closeInfo, options) {
     .meta { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
     .name { color: #f2f3f5; font-weight: 700; }
     .time { color: #949ba4; font-size: 12px; }
+    .message-id { margin-top: 2px; color: #949ba4; font-size: 12px; }
     .content { white-space: normal; overflow-wrap: anywhere; }
     .muted { color: #949ba4; }
     .embed { margin-top: 8px; max-width: 520px; padding: 12px; border-left: 4px solid #5865f2; border-radius: 4px; background: #2b2d31; }
@@ -98,6 +113,8 @@ export async function createTranscript(channel, ticket, closeInfo, options) {
     .attachments { display: grid; gap: 8px; margin-top: 8px; }
     .attachment img { max-width: min(520px, 100%); border-radius: 6px; }
     .file { color: #00a8fc; }
+    .reactions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .reactions span { padding: 2px 8px; border-radius: 10px; background: #232428; color: #dbdee1; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -108,6 +125,7 @@ export async function createTranscript(channel, ticket, closeInfo, options) {
       <span>Closed by: ${escapeHtml(closeInfo.closedByTag)}</span>
       <span>Reason: ${escapeHtml(closeInfo.reason)}</span>
       <span>Result: ${escapeHtml(closeInfo.resultLabel)}</span>
+      ${metadata}
       <span>Generated: ${escapeHtml(new Date(timestamp).toLocaleString())}</span>
     </div>
   </header>
