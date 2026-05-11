@@ -58,6 +58,22 @@ panel:
   thumbnail: "https://example.com/icon.png"
 ```
 
+Support and bug panels support the same optional fields:
+
+```yaml
+support:
+  panel:
+    image: "https://example.com/support-banner.png"
+    thumbnail: "https://example.com/support-icon.png"
+
+bugs:
+  panel:
+    image: "https://example.com/bugs-banner.png"
+    thumbnail: "https://example.com/bugs-icon.png"
+```
+
+When using `/embed create` or `/embed edit`, reply `skip`, `none`, `no`, or `-` for optional image and thumbnail fields.
+
 Mention the bot in any channel it can read to receive a help embed listing all available slash commands.
 
 Stats channels build an accurate role/bot snapshot when the bot starts, then refresh when members join or leave, when member roles change, and after verification button clicks. Run `/stats refresh` after changing a stat role ID or after assigning roles while the bot was offline. A periodic fallback is only used if `fallbackIntervalMinutes` is set above `0` in `config/modules/stats.yml`.

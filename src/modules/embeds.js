@@ -8,7 +8,7 @@ function getConfig(ctx) {
 
 function clean(value) {
   const text = String(value ?? '').trim();
-  if (!text || text.toLowerCase() === 'skip' || text.toLowerCase() === 'none') return null;
+  if (!text || ['skip', 'none', 'no', '-'].includes(text.toLowerCase())) return null;
   return text;
 }
 
@@ -49,8 +49,8 @@ async function collectEmbed(interaction, current = null) {
     `embed title${current?.title ? ` (current: ${current.title})` : ''}. Reply "skip" to leave blank/current.`,
     `embed content/description${current?.description ? ' (reply "skip" to keep current)' : ''}.`,
     `hex color${current?.hexColor ? ` (current: ${current.hexColor})` : ''}. Example: #5865F2.`,
-    `image URL${current?.image?.url ? ' (reply "skip" to keep current)' : ''}.`,
-    `thumbnail/cover URL${current?.thumbnail?.url ? ' (reply "skip" to keep current)' : ''}.`,
+    `optional image URL${current?.image?.url ? ' (reply "skip" to keep current)' : ' (reply "skip" for none)'}.`,
+    `optional thumbnail/cover URL${current?.thumbnail?.url ? ' (reply "skip" to keep current)' : ' (reply "skip" for none)'}.`,
     `footer text${current?.footer?.text ? ' (reply "skip" to keep current)' : ''}.`,
   ];
 

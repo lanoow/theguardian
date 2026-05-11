@@ -39,6 +39,8 @@ function buildPanel(ctx, kind) {
     title: panel.title,
     description: panel.description,
     color: panel.color,
+    image: panel.image,
+    thumbnail: panel.thumbnail,
     timestamp: true,
   });
   const button = new ButtonBuilder()

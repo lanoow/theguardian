@@ -9,6 +9,8 @@ support:
   panel:
     title: "Need help?"
     description: "Open a support ticket and our staff will help you."
+    image: ""
+    thumbnail: ""
     buttonLabel: "Open Ticket"
     buttonEmoji: "🎫"
     color: "#5865F2"
@@ -27,6 +29,8 @@ bugs:
   panel:
     title: "Report a bug"
     description: "Open a bug report and include reproduction details."
+    image: ""
+    thumbnail: ""
     buttonLabel: "Report Bug"
     buttonEmoji: "🐛"
     color: "#ED4245"

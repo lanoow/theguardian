@@ -8,6 +8,8 @@ panel:
   title: "Verify your account"
   description: "Click the button below to gain access to the server."
   color: "#57F287"
+  image: ""
+  thumbnail: ""
   buttonLabel: "Verify"
   buttonEmoji: "✅"
 
