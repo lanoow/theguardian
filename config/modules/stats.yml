@@ -1,16 +1,16 @@
 enabled: true
-updateIntervalMinutes: 10
+updateIntervalMinutes: 1
 
-categoryId: "STATS_CATEGORY_ID"
+categoryId: "1502783436853608508"
 
 channels:
   - key: "members"
     type: "members"
-    name: "Members: {count}"
-  - key: "bots"
-    type: "bots"
-    name: "Bots: {count}"
-  - key: "verified"
+    name: "｜👥・{count} Members"
+  # - key: "bots"
+  #   type: "bots"
+  #   name: "Bots: {count}"
+  - key: "clients"
     type: "role"
-    roleId: "VERIFIED_ROLE_ID"
-    name: "Verified: {count}"
+    roleId: "1295001304522948740"
+    name: "｜💎・{count} Clients"

@@ -1,14 +1,14 @@
 enabled: true
 
 joinRoleId: "UNVERIFIED_ROLE_ID"
-verifiedRoleId: "VERIFIED_ROLE_ID"
-verificationChannelId: "VERIFICATION_CHANNEL_ID"
+verifiedRoleId: "1295000609249820713"
+verificationChannelId: "1502783951381729384"
 
 panel:
-  title: "Verify your account"
+  title: "Verify you're human!"
   description: "Click the button below to gain access to the server."
   color: "#57F287"
-  image: ""
+  image: "https://cdn.discordapp.com/attachments/1503046497267224746/1503498089078722621/ChatGPT_Image_May_11_2026_11_44_22_PM.png?ex=6a039136&is=6a023fb6&hm=7d01a5a08e29069343425567c701827eb098c70684058324192041273d657648&"
   thumbnail: ""
   buttonLabel: "Verify"
   buttonEmoji: "✅"

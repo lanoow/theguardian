@@ -1,15 +1,16 @@
 enabled: true
 
 support:
-  panelChannelId: "SUPPORT_PANEL_CHANNEL_ID"
-  categoryId: "SUPPORT_CATEGORY_ID"
-  transcriptChannelId: "SUPPORT_TRANSCRIPTS_CHANNEL_ID"
+  panelChannelId: "1502787024057532572"
+  categoryId: "1503050975877791846"
+  transcriptChannelId: "1503051418381058128"
   staffRoles:
-    - "STAFF_ROLE_ID"
+    - "1294999266342993942"
+    - "1502795260638789832"
   panel:
     title: "Need help?"
     description: "Open a support ticket and our staff will help you."
-    image: ""
+    image: "https://cdn.discordapp.com/attachments/1503046497267224746/1503494987461955775/ChatGPT_Image_May_11_2026_11_31_37_PM.png?ex=6a038e52&is=6a023cd2&hm=ba5979e4eaef3810a0c29de1300c4210b9955c6ec55fe16a64ee5db7ed48a1fa&"
     thumbnail: ""
     buttonLabel: "Open Ticket"
     buttonEmoji: "🎫"
@@ -22,15 +23,16 @@ support:
   categories: []
 
 bugs:
-  panelChannelId: "BUG_PANEL_CHANNEL_ID"
-  categoryId: "BUG_CATEGORY_ID"
-  transcriptChannelId: "BUG_TRANSCRIPTS_CHANNEL_ID"
+  panelChannelId: "1502792264370622474"
+  categoryId: "1503051661453688933"
+  transcriptChannelId: "1503051418381058128"
   staffRoles:
-    - "STAFF_ROLE_ID"
+    - "1294999266342993942"
+    - "1502795260638789832"
   panel:
     title: "Report a bug"
     description: "Open a bug report and include reproduction details."
-    image: ""
+    image: "https://cdn.discordapp.com/attachments/1503046497267224746/1503495164281225297/ChatGPT_Image_May_11_2026_11_32_50_PM.png?ex=6a038e7c&is=6a023cfc&hm=236d66e6cddaeb1ae11857417c69ad84d590b2d6233ae4cb88575460ea38ddf4&"
     thumbnail: ""
     buttonLabel: "Report Bug"
     buttonEmoji: "🐛"

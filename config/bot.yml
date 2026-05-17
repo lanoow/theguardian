@@ -6,9 +6,11 @@ bot:
 
 permissions:
   staffRoles:
-    - "STAFF_ROLE_ID"
+    - "1294999266342993942"
+    - "1502795260638789832"
   adminRoles:
-    - "ADMIN_ROLE_ID"
+    - "1294999266342993942"
+    - "1502795260638789832"
 
 storage:
   dataDir: "data"
